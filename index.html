@@ -9,8 +9,10 @@
 <body>
     <header class="header">
         <div class="header-content">
-            <button class="menu-button" id="menuButton">☰</button>
-            <a href="index.html" class="logo">🏨 宿ガチャ</a>
+            <div class="header-left">
+                <button class="menu-button" id="menuButton">☰</button>
+                <a href="index.html" class="logo">🏨 宿ガチャ</a>
+            </div>
             <nav class="nav-links">
                 <a href="pages/user/mypage.html">マイページ</a>
             </nav>
@@ -59,20 +61,23 @@
                     <label class="form-label" for="area">エリア</label>
                     <select class="form-select" id="area" required>
                         <option value="">エリアを選択してください</option>
-                        <option value="東京">東京</option>
-                        <option value="京都">京都</option>
-                        <option value="沖縄">沖縄</option>
-                        <option value="北海道">北海道</option>
+                        <option value="東京都">東京都</option>
+                        <option value="神奈川県">神奈川県</option>
+                        <option value="千葉県">千葉県</option>
+                        <option value="埼玉県">埼玉県</option>
+                        <option value="茨城県">茨城県</option>
+                        <option value="栃木県">栃木県</option>
+                        <option value="群馬県">群馬県</option>
                     </select>
                 </div>
 
                 <div class="form-group">
-                    <label class="form-label" for="checkInDate">チェックイン日</label>
+                    <label class="form-label" for="checkInDate">宿泊日</label>
                     <input type="date" class="form-input" id="checkInDate" required>
                 </div>
 
                 <div class="form-group">
-                    <label class="form-label" for="nights">宿泊数</label>
+                    <label class="form-label" for="nights">何泊</label>
                     <select class="form-select" id="nights" required>
                         <option value="1">1泊</option>
                         <option value="2">2泊</option>

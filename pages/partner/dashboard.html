@@ -9,8 +9,10 @@
 <body>
     <header class="header">
         <div class="header-content">
-            <button class="menu-button" id="menuButton">☰</button>
-            <a href="dashboard.html" class="logo">🏨 宿ガチャ パートナー管理</a>
+            <div class="header-left">
+                <button class="menu-button" id="menuButton">☰</button>
+                <a href="dashboard.html" class="logo">🏨 宿ガチャ パートナー管理</a>
+            </div>
             <nav class="nav-links">
                 <a href="#" onclick="alert('ログアウトしました'); window.location.href='../../index.html'">ログアウト</a>
             </nav>
@@ -170,7 +172,7 @@
             const upcoming = activeReservations.filter(r => new Date(r.checkInDate) >= today);
             const totalRevenue = activeReservations.reduce((sum, r) => sum + r.price, 0);
             
-            document.getElementById('totalReservations').textContent = reservations.length;
+            document.getElementById('totalReservations').textContent = activeReservations.length;
             document.getElementById('upcomingReservations').textContent = upcoming.length;
             document.getElementById('totalRevenue').textContent = '¥' + totalRevenue.toLocaleString();
         }

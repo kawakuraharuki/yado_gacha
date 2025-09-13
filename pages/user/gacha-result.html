@@ -9,8 +9,10 @@
 <body>
     <header class="header">
         <div class="header-content">
-            <button class="menu-button" id="menuButton">☰</button>
-            <a href="../../index.html" class="logo">🏨 宿ガチャ</a>
+            <div class="header-left">
+                <button class="menu-button" id="menuButton">☰</button>
+                <a href="../../index.html" class="logo">🏨 宿ガチャ</a>
+            </div>
             <nav class="nav-links">
                 <a href="mypage.html">マイページ</a>
             </nav>
@@ -121,6 +123,11 @@
                 </div>
             </div>
 
+            <!-- 観光プランセクション -->
+            <div id="tourismPlanContainer" style="margin-top: 20px;">
+                <!-- 観光プランがここに表示される -->
+            </div>
+
             <div style="text-align: center; margin-top: 30px;">
                 <button class="btn btn-success" onclick="window.location.href='mypage.html'">
                     マイページで予約を確認
@@ -133,6 +140,8 @@
     </main>
 
     <script src="../../js/data.js"></script>
+    <script src="../../js/tourism-data.js"></script>
+    <script src="../../js/image-loader.js"></script>
     <script src="../../js/menu.js"></script>
     <script>
         const reservationId = sessionStorage.getItem('latestReservationId');
@@ -153,12 +162,10 @@
         const hotels = getHotels();
         const hotel = hotels.find(h => h.id === reservation.hotelId);
 
-        // 即座に結果を表示するか、当日まで待つか
-        if (reservation.planType === 'instant') {
-            // すぐわかるガチャの場合
+        // プランタイプに応じて表示を分岐
+        if (reservation.planType === 'instant' || reservation.status === 'revealed') {
             showGachaAnimation();
         } else {
-            // 当日わかるガチャの場合
             showPendingResult();
         }
 
@@ -188,8 +195,8 @@
             document.getElementById('resultContainer').style.display = 'block';
             
             // ホテル情報を表示
-            document.getElementById('hotelImage').src = hotel.image;
-            document.getElementById('hotelImage').alt = hotel.name;
+            const hotelImage = document.getElementById('hotelImage');
+            loadHotelImage(hotelImage, hotel, '../../');
             document.getElementById('hotelName').textContent = hotel.name;
             document.getElementById('hotelAddress').textContent = hotel.address;
             document.getElementById('hotelPhone').textContent = hotel.phone;
@@ -222,6 +229,12 @@
                     <div><strong>料金:</strong> ¥${reservation.price.toLocaleString()}</div>
                 </div>
             `;
+            
+            // 観光プランを表示
+            const tourismPlanHTML = generateTourismPlanHTML(hotel.area);
+            if (tourismPlanHTML) {
+                document.getElementById('tourismPlanContainer').innerHTML = tourismPlanHTML;
+            }
         }
     </script>
 </body>

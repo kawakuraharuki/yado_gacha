@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>ローカルストレージクリア</title>
+</head>
+<body>
+    <h1>ローカルストレージ管理ツール</h1>
+    
+    <button onclick="clearAll()">全データをクリア</button>
+    <button onclick="clearHotels()">ホテルデータのみクリア</button>
+    <button onclick="showData()">現在のデータを表示</button>
+    
+    <div id="result" style="margin-top: 20px; padding: 20px; background: #f0f0f0;"></div>
+    
+    <script>
+        function clearAll() {
+            localStorage.clear();
+            document.getElementById('result').innerHTML = '<p style="color: green;">全データをクリアしました。</p>';
+        }
+        
+        function clearHotels() {
+            localStorage.removeItem('yadogacha_hotels');
+            document.getElementById('result').innerHTML = '<p style="color: green;">ホテルデータをクリアしました。</p>';
+        }
+        
+        function showData() {
+            const hotels = localStorage.getItem('yadogacha_hotels');
+            const reservations = localStorage.getItem('yadogacha_reservations');
+            const user = localStorage.getItem('yadogacha_current_user');
+            
+            let html = '<h3>現在のローカルストレージ</h3>';
+            html += '<p><strong>ホテルデータ:</strong> ' + (hotels ? JSON.parse(hotels).length + '件' : 'なし') + '</p>';
+            html += '<p><strong>予約データ:</strong> ' + (reservations ? JSON.parse(reservations).length + '件' : 'なし') + '</p>';
+            html += '<p><strong>ユーザー:</strong> ' + (user || 'なし') + '</p>';
+            
+            if (hotels) {
+                const hotelData = JSON.parse(hotels);
+                const areaCount = {};
+                hotelData.forEach(h => {
+                    areaCount[h.area] = (areaCount[h.area] || 0) + 1;
+                });
+                html += '<h4>エリア別ホテル数</h4>';
+                for (const [area, count] of Object.entries(areaCount)) {
+                    html += `<p>${area}: ${count}件</p>`;
+                }
+            }
+            
+            document.getElementById('result').innerHTML = html;
+        }
+        
+        // ページ読み込み時に現在のデータを表示
+        showData();
+    </script>
+</body>
+</html>

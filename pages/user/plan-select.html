@@ -9,8 +9,10 @@
 <body>
     <header class="header">
         <div class="header-content">
-            <button class="menu-button" id="menuButton">☰</button>
-            <a href="../../index.html" class="logo">🏨 宿ガチャ</a>
+            <div class="header-left">
+                <button class="menu-button" id="menuButton">☰</button>
+                <a href="../../index.html" class="logo">🏨 宿ガチャ</a>
+            </div>
             <nav class="nav-links">
                 <a href="mypage.html">マイページ</a>
             </nav>
@@ -62,10 +64,10 @@
                 <div class="plan-card" data-plan="instant">
                     <div class="plan-icon">⚡</div>
                     <h2 class="plan-name">すぐわかるガチャ</h2>
-                    <div class="plan-price">¥<span id="instantPrice">12,000</span>〜</div>
+                    <div class="plan-price">¥<span id="instantPrice">10,000</span></div>
                     <p class="plan-description">
-                        予約完了後、すぐに宿泊先が判明！<br>
-                        計画を立てやすい安心プラン
+                        予約と同時に宿泊先が判明<br>
+                        すぐに旅行の計画が立てられます
                     </p>
                     <div style="margin-top: 20px;">
                         <span class="feature-tag">即時確定</span>
@@ -76,10 +78,10 @@
                 <div class="plan-card" data-plan="surprise">
                     <div class="plan-icon">🎁</div>
                     <h2 class="plan-name">当日わかるガチャ</h2>
-                    <div class="plan-price">¥<span id="surprisePrice">8,000</span>〜</div>
+                    <div class="plan-price">¥<span id="surprisePrice">5,000</span></div>
                     <p class="plan-description">
-                        宿泊当日の正午に判明！<br>
-                        よりお得な価格でワクワク体験
+                        宿泊当日まで宿泊先はシークレット<br>
+                        ドキドキ感とお得な価格を両立
                     </p>
                     <div style="margin-top: 20px;">
                         <span class="feature-tag">最大33%OFF</span>
@@ -130,8 +132,8 @@
 
         // 価格の計算（エリアと人数に基づく）
         const basePrices = {
-            instant: { '東京': 12000, '京都': 15000, '沖縄': 14000, '北海道': 13000 },
-            surprise: { '東京': 8000, '京都': 10000, '沖縄': 9500, '北海道': 9000 }
+            instant: { '東京都': 10000, '神奈川県': 10000, '千葉県': 10000, '埼玉県': 10000, '茨城県': 10000, '栃木県': 10000, '群馬県': 10000 },
+            surprise: { '東京都': 5000, '神奈川県': 5000, '千葉県': 5000, '埼玉県': 5000, '茨城県': 5000, '栃木県': 5000, '群馬県': 5000 }
         };
 
         const instantPrice = basePrices.instant[searchParams.area] * parseInt(searchParams.guests);

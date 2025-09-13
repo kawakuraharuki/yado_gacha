@@ -9,8 +9,10 @@
 <body>
     <header class="header">
         <div class="header-content">
-            <button class="menu-button" id="menuButton">☰</button>
-            <a href="../../index.html" class="logo">🏨 宿ガチャ</a>
+            <div class="header-left">
+                <button class="menu-button" id="menuButton">☰</button>
+                <a href="../../index.html" class="logo">🏨 宿ガチャ</a>
+            </div>
             <nav class="nav-links">
                 <a href="mypage.html">マイページ</a>
             </nav>
@@ -143,10 +145,34 @@
         document.getElementById('reservationForm').addEventListener('submit', function(e) {
             e.preventDefault();
 
-            // ランダムにホテルを選択
-            const hotels = getHotels().filter(h => h.area === planData.area);
+            // デバッグ情報を表示
+            console.log('=== 予約処理デバッグ ===');
+            console.log('選択されたエリア:', planData.area);
+            debugHotelData(); // data.jsのデバッグ関数を呼び出し
+            
+            // エリアに対応するホテルを取得
+            const hotels = getHotelsByArea(planData.area);
+            console.log(`${planData.area}のホテル:`, hotels);
+            
+            if (hotels.length === 0) {
+                // ローカルストレージをクリアして再初期化を試みる
+                console.error('ホテルが見つかりません。ローカルストレージを再初期化します。');
+                localStorage.removeItem('yadogacha_hotels');
+                initializeData();
+                
+                // 再度取得を試みる
+                const retryHotels = getHotelsByArea(planData.area);
+                if (retryHotels.length === 0) {
+                    alert(`申し訳ございません。${planData.area}のホテルデータの読み込みに失敗しました。\n\nページをリロードしてもう一度お試しください。`);
+                    return;
+                } else {
+                    console.log('再初期化後にホテルが見つかりました:', retryHotels);
+                    hotels.push(...retryHotels);
+                }
+            }
+            
             const selectedHotel = hotels[Math.floor(Math.random() * hotels.length)];
-
+            
             // 予約データの作成
             const reservation = {
                 id: 'RES' + Date.now(),
@@ -165,7 +191,9 @@
                 price: planData.price,
                 status: planData.planType === 'instant' ? 'revealed' : 'pending',
                 createdAt: new Date().toISOString(),
-                revealDate: planData.planType === 'instant' ? new Date().toISOString() : checkInDate.toISOString()
+                revealDate: planData.planType === 'instant' 
+                    ? new Date().toISOString() 
+                    : new Date(planData.checkInDate).toISOString()
             };
 
             // 予約を保存
