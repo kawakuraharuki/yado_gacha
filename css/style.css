@@ -41,6 +41,7 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    position: relative;
 }
 
 .logo {
@@ -65,6 +66,131 @@ body {
 
 .nav-links a:hover {
     background: rgba(255,255,255,0.2);
+}
+
+/* ハンバーガーメニュー */
+.menu-button {
+    position: absolute;
+    left: 20px;
+    background: none;
+    border: none;
+    color: white;
+    font-size: 1.5rem;
+    cursor: pointer;
+    padding: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+    transition: background 0.3s;
+}
+
+.menu-button:hover {
+    background: rgba(255,255,255,0.2);
+}
+
+/* モーダルメニュー */
+.menu-modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.5);
+    z-index: 1000;
+    animation: fadeIn 0.3s ease;
+}
+
+.menu-modal.active {
+    display: block;
+}
+
+.menu-content {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 300px;
+    height: 100%;
+    background: white;
+    box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+    animation: slideIn 0.3s ease;
+}
+
+@keyframes slideIn {
+    from { transform: translateX(-100%); }
+    to { transform: translateX(0); }
+}
+
+.menu-header {
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+    color: white;
+    padding: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.menu-close {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 1.5rem;
+    cursor: pointer;
+    padding: 5px;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    transition: background 0.3s;
+}
+
+.menu-close:hover {
+    background: rgba(255,255,255,0.2);
+}
+
+.menu-section {
+    padding: 20px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.menu-section h3 {
+    margin-bottom: 15px;
+    color: var(--text-dark);
+    font-size: 1.1rem;
+}
+
+.menu-item {
+    display: block;
+    padding: 12px 20px;
+    color: var(--text-dark);
+    text-decoration: none;
+    border-radius: 8px;
+    transition: all 0.3s;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.menu-item:hover {
+    background: var(--bg-light);
+    transform: translateX(5px);
+}
+
+.menu-item-icon {
+    font-size: 1.2rem;
+}
+
+/* レスポンシブ調整 */
+@media (max-width: 768px) {
+    .logo {
+        margin-left: 60px;
+    }
 }
 
 /* コンテナ */

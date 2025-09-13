@@ -9,13 +9,43 @@
 <body>
     <header class="header">
         <div class="header-content">
+            <button class="menu-button" id="menuButton">☰</button>
             <a href="index.html" class="logo">🏨 宿ガチャ</a>
             <nav class="nav-links">
                 <a href="pages/user/mypage.html">マイページ</a>
-                <a href="pages/partner/dashboard.html">パートナー管理</a>
             </nav>
         </div>
     </header>
+
+    <!-- メニューモーダル -->
+    <div class="menu-modal" id="menuModal">
+        <div class="menu-content">
+            <div class="menu-header">
+                <h2>メニュー</h2>
+                <button class="menu-close" id="menuClose">✕</button>
+            </div>
+            
+            <div class="menu-section">
+                <h3>ユーザー向け</h3>
+                <a href="index.html" class="menu-item">
+                    <span class="menu-item-icon">🏠</span>
+                    <span>トップページ</span>
+                </a>
+                <a href="pages/user/mypage.html" class="menu-item">
+                    <span class="menu-item-icon">👤</span>
+                    <span>マイページ</span>
+                </a>
+            </div>
+            
+            <div class="menu-section">
+                <h3>ホテルパートナー向け</h3>
+                <a href="pages/partner/dashboard.html" class="menu-item">
+                    <span class="menu-item-icon">📊</span>
+                    <span>管理画面</span>
+                </a>
+            </div>
+        </div>
+    </div>
 
     <main class="container">
         <div class="search-form">
@@ -91,6 +121,7 @@
     </main>
 
     <script src="js/data.js"></script>
+    <script src="js/menu.js"></script>
     <script>
         // 日付の最小値を今日に設定
         document.getElementById('checkInDate').min = new Date().toISOString().split('T')[0];
