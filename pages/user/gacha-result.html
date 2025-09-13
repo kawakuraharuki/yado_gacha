@@ -11,7 +11,7 @@
         <div class="header-content">
             <div class="header-left">
                 <button class="menu-button" id="menuButton">☰</button>
-                <a href="../../index.html" class="logo">🏨 宿ガチャ</a>
+                <img src="../../assets/images/logo.png" alt="宿ガチャ" class="logo-image">
             </div>
             <nav class="nav-links">
                 <a href="mypage.html">マイページ</a>
@@ -241,8 +241,8 @@
         function showResult() {
             document.getElementById('resultContainer').style.display = 'block';
             
-            // hotel_001の場合は特別な演出
-            if (hotel.id === 'hotel_001') {
+            // 特別ホテルの場合は特別な演出
+            if (hotel.id === 'hotel_001' || hotel.id === 'hotel_010') {
                 // お祝いメッセージを特別仕様に
                 const congratsMessage = document.getElementById('congratsMessage');
                 congratsMessage.innerHTML = '<span class="jackpot-text">🎊 おめでとうございます！ 🎊</span>';
@@ -259,7 +259,7 @@
             // ホテル名を表示（hotel_001の場合は特別バッジ付き）
             const hotelNameElement = document.getElementById('hotelName');
             hotelNameElement.textContent = hotel.name;
-            if (hotel.id === 'hotel_001') {
+            if (hotel.id === 'hotel_001' || hotel.id === 'hotel_010') {
                 const badge = document.createElement('span');
                 badge.className = 'special-badge';
                 badge.textContent = '✨ スペシャル';

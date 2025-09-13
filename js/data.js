@@ -161,6 +161,42 @@ const mockHotels = [
         features: ["格安料金", "大浴場", "コインランドリー", "喫煙可", "駅から徒歩8分"],
         image: "assets/images/hotels/hotel_009.jpg",
         placeholder: "https://via.placeholder.com/800x400/8B7355/ffffff?text=下町ビジネスホテル+昭和館"
+    },
+    {
+        id: "hotel_010",
+        name: "鬼怒川温泉ホテル",
+        type: "温泉ホテル",
+        area: "栃木県",
+        address: "栃木県日光市鬼怒川温泉大原1409",
+        phone: "0288-2345-6789",
+        checkIn: "15:00",
+        checkOut: "10:00",
+        price: {
+            instant: 10000,
+            surprise: 5000
+        },
+        description: "鬼怒川渓谷を見下ろす絶景温泉ホテル。四季折々の自然美と上質な温泉を楽しめます。",
+        features: ["渓谷美", "露天風呂", "懐石料理", "貸切風呂", "季節の庭園"],
+        image: "assets/images/hotels/hotel_010.jpg",
+        placeholder: "https://via.placeholder.com/800x400/2E8B57/ffffff?text=鬼怒川温泉ホテル"
+    },
+    {
+        id: "hotel_011",
+        name: "那須ログコテージ 森の家",
+        type: "コテージ",
+        area: "栃木県",
+        address: "栃木県那須郡那須町高久乙3375-234",
+        phone: "0287-7890-1234",
+        checkIn: "15:00",
+        checkOut: "10:00",
+        price: {
+            instant: 10000,
+            surprise: 5000
+        },
+        description: "那須の森に佇む一棟貸しのログコテージ。自然に囲まれながら、のんびりとした時間を過ごせます。",
+        features: ["一棟貸し", "薪ストーブ", "バーベキューセット", "ペット可", "キッチン付き"],
+        image: "assets/images/hotels/hotel_011.jpg",
+        placeholder: "https://via.placeholder.com/800x400/8B4513/ffffff?text=那須ログコテージ+森の家"
     }
 ];
 
