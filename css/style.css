@@ -936,6 +936,8 @@ body {
     border-radius: 15px;
     padding: 20px;
     box-shadow: var(--shadow);
+    max-width: 600px;
+    margin: 0 auto;
 }
 
 .calendar-header {
@@ -948,7 +950,7 @@ body {
 .calendar-grid {
     display: grid;
     grid-template-columns: repeat(7, 1fr);
-    gap: 5px;
+    gap: 3px;
 }
 
 .calendar-day {
@@ -958,13 +960,16 @@ body {
     align-items: center;
     justify-content: center;
     border: 1px solid var(--border-color);
-    border-radius: 8px;
+    border-radius: 6px;
     cursor: pointer;
     transition: all 0.3s;
+    padding: 5px;
+    min-height: 50px;
 }
 
 .calendar-day:hover {
     background: var(--bg-light);
+    transform: scale(1.05);
 }
 
 .calendar-day.has-inventory {
@@ -974,10 +979,12 @@ body {
 
 .day-number {
     font-weight: bold;
+    font-size: 0.9rem;
     margin-bottom: 2px;
 }
 
 .day-info {
-    font-size: 0.8rem;
-    color: var(--text-light);
+    font-size: 0.7rem;
+    color: #2196f3;
+    font-weight: 500;
 }

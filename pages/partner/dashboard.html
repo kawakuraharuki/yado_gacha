@@ -97,9 +97,9 @@
                 
                 <div class="calendar">
                     <div class="calendar-header">
-                        <button class="btn btn-secondary" id="prevMonth">◀</button>
-                        <h3 id="currentMonth"></h3>
-                        <button class="btn btn-secondary" id="nextMonth">▶</button>
+                        <button class="btn btn-secondary" id="prevMonth" style="padding: 8px 15px; font-size: 0.9rem;">◀</button>
+                        <h3 id="currentMonth" style="font-size: 1.2rem;"></h3>
+                        <button class="btn btn-secondary" id="nextMonth" style="padding: 8px 15px; font-size: 0.9rem;">▶</button>
                     </div>
                     
                     <div class="calendar-grid" id="calendarGrid">
@@ -206,6 +206,9 @@
                 const header = document.createElement('div');
                 header.style.fontWeight = 'bold';
                 header.style.textAlign = 'center';
+                header.style.fontSize = '0.85rem';
+                header.style.color = '#666';
+                header.style.padding = '5px 0';
                 header.textContent = day;
                 grid.appendChild(header);
             });
