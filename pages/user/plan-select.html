@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>プラン選択 - 宿ガチャ</title>
+    <link rel="stylesheet" href="../../css/style.css">
+</head>
+<body>
+    <header class="header">
+        <div class="header-content">
+            <a href="../../index.html" class="logo">🏨 宿ガチャ</a>
+            <nav class="nav-links">
+                <a href="mypage.html">マイページ</a>
+                <a href="../partner/dashboard.html">パートナー管理</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container">
+        <div class="card">
+            <h1 style="text-align: center; margin-bottom: 10px;">ガチャプランを選択</h1>
+            <p style="text-align: center; color: #666; margin-bottom: 30px;">
+                どちらのプランも快適な滞在をお約束する、厳選されたホテル・旅館です
+            </p>
+
+            <div id="searchSummary" style="text-align: center; margin-bottom: 30px; padding: 15px; background: #f8f9fa; border-radius: 10px;">
+                <!-- 検索条件のサマリーがここに表示される -->
+            </div>
+
+            <div class="plan-grid">
+                <div class="plan-card" data-plan="instant">
+                    <div class="plan-icon">⚡</div>
+                    <h2 class="plan-name">すぐわかるガチャ</h2>
+                    <div class="plan-price">¥<span id="instantPrice">12,000</span>〜</div>
+                    <p class="plan-description">
+                        予約完了後、すぐに宿泊先が判明！<br>
+                        計画を立てやすい安心プラン
+                    </p>
+                    <div style="margin-top: 20px;">
+                        <span class="feature-tag">即時確定</span>
+                        <span class="feature-tag">計画しやすい</span>
+                    </div>
+                </div>
+
+                <div class="plan-card" data-plan="surprise">
+                    <div class="plan-icon">🎁</div>
+                    <h2 class="plan-name">当日わかるガチャ</h2>
+                    <div class="plan-price">¥<span id="surprisePrice">8,000</span>〜</div>
+                    <p class="plan-description">
+                        宿泊当日の正午に判明！<br>
+                        よりお得な価格でワクワク体験
+                    </p>
+                    <div style="margin-top: 20px;">
+                        <span class="feature-tag">最大33%OFF</span>
+                        <span class="feature-tag">サプライズ</span>
+                    </div>
+                </div>
+            </div>
+
+            <div style="margin-top: 30px; text-align: center;">
+                <button id="confirmButton" class="btn btn-primary" disabled>
+                    プランを選択してください
+                </button>
+            </div>
+        </div>
+
+        <div class="card" style="margin-top: 20px;">
+            <h3 style="margin-bottom: 15px;">🔒 品質保証</h3>
+            <ul style="line-height: 1.8; color: #666;">
+                <li>すべての宿泊施設は、当社の厳格な基準をクリアしています</li>
+                <li>清潔で快適な客室をご提供</li>
+                <li>各エリアの人気施設から厳選</li>
+                <li>万が一のトラブルには24時間サポート</li>
+            </ul>
+        </div>
+    </main>
+
+    <script src="../../js/data.js"></script>
+    <script>
+        let selectedPlan = null;
+        const searchParams = JSON.parse(sessionStorage.getItem('searchParams'));
+
+        if (!searchParams) {
+            window.location.href = '../../index.html';
+        }
+
+        // 検索条件のサマリー表示
+        const checkInDate = new Date(searchParams.checkInDate);
+        const checkOutDate = new Date(searchParams.checkInDate);
+        checkOutDate.setDate(checkOutDate.getDate() + parseInt(searchParams.nights));
+
+        document.getElementById('searchSummary').innerHTML = `
+            <strong>${searchParams.area}</strong> | 
+            ${checkInDate.toLocaleDateString('ja-JP')} 〜 ${checkOutDate.toLocaleDateString('ja-JP')} | 
+            ${searchParams.nights}泊 | 
+            ${searchParams.guests}名
+        `;
+
+        // 価格の計算（エリアと人数に基づく）
+        const basePrices = {
+            instant: { '東京': 12000, '京都': 15000, '沖縄': 14000, '北海道': 13000 },
+            surprise: { '東京': 8000, '京都': 10000, '沖縄': 9500, '北海道': 9000 }
+        };
+
+        const instantPrice = basePrices.instant[searchParams.area] * parseInt(searchParams.guests);
+        const surprisePrice = basePrices.surprise[searchParams.area] * parseInt(searchParams.guests);
+
+        document.getElementById('instantPrice').textContent = instantPrice.toLocaleString();
+        document.getElementById('surprisePrice').textContent = surprisePrice.toLocaleString();
+
+        // プラン選択処理
+        document.querySelectorAll('.plan-card').forEach(card => {
+            card.addEventListener('click', function() {
+                document.querySelectorAll('.plan-card').forEach(c => c.classList.remove('selected'));
+                this.classList.add('selected');
+                selectedPlan = this.dataset.plan;
+                
+                const button = document.getElementById('confirmButton');
+                button.disabled = false;
+                button.textContent = this.querySelector('.plan-name').textContent + 'で予約する';
+            });
+        });
+
+        // 確認ボタン処理
+        document.getElementById('confirmButton').addEventListener('click', function() {
+            if (!selectedPlan) return;
+
+            const planData = {
+                ...searchParams,
+                planType: selectedPlan,
+                price: selectedPlan === 'instant' ? instantPrice : surprisePrice
+            };
+
+            sessionStorage.setItem('planData', JSON.stringify(planData));
+            window.location.href = 'reservation.html';
+        });
+    </script>
+</body>
+</html>

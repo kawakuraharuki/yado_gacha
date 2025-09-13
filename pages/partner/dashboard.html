@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>パートナー管理画面 - 宿ガチャ</title>
+    <link rel="stylesheet" href="../../css/style.css">
+</head>
+<body>
+    <header class="header">
+        <div class="header-content">
+            <a href="../../index.html" class="logo">🏨 宿ガチャ パートナー管理</a>
+            <nav class="nav-links">
+                <a href="../../index.html">ユーザーサイトへ</a>
+                <a href="#" onclick="alert('ログアウトしました'); window.location.href='../../index.html'">ログアウト</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="admin-dashboard">
+        <div class="card">
+            <h1>東京ベイサイドホテル 管理画面</h1>
+            <p style="color: #666;">パートナーID: hotel_001</p>
+        </div>
+
+        <!-- 統計情報 -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-number" id="totalReservations">0</div>
+                <div class="stat-label">総予約数</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="upcomingReservations">0</div>
+                <div class="stat-label">今後の予約</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="totalRevenue">¥0</div>
+                <div class="stat-label">総売上</div>
+            </div>
+        </div>
+
+        <!-- タブナビゲーション -->
+        <div style="display: flex; gap: 10px; margin-bottom: 20px;">
+            <button class="btn btn-secondary tab-btn active" data-tab="inventory">
+                在庫管理
+            </button>
+            <button class="btn btn-secondary tab-btn" data-tab="reservations">
+                予約一覧
+            </button>
+        </div>
+
+        <!-- 在庫管理タブ -->
+        <div id="inventoryTab" class="tab-content">
+            <div class="card">
+                <h2 style="margin-bottom: 20px;">在庫管理</h2>
+                
+                <div class="calendar">
+                    <div class="calendar-header">
+                        <button class="btn btn-secondary" id="prevMonth">◀</button>
+                        <h3 id="currentMonth"></h3>
+                        <button class="btn btn-secondary" id="nextMonth">▶</button>
+                    </div>
+                    
+                    <div class="calendar-grid" id="calendarGrid">
+                        <!-- カレンダーがここに生成される -->
+                    </div>
+                </div>
+                
+                <div style="margin-top: 30px; padding: 20px; background: #f8f9fa; border-radius: 10px;">
+                    <h4 style="margin-bottom: 15px;">在庫登録</h4>
+                    <form id="inventoryForm">
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
+                            <div class="form-group">
+                                <label class="form-label" for="inventoryDate">日付</label>
+                                <input type="date" class="form-input" id="inventoryDate" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label" for="roomCount">提供部屋数</label>
+                                <input type="number" class="form-input" id="roomCount" min="1" max="10" value="1" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label" for="roomPrice">1部屋の卸値（円）</label>
+                                <input type="number" class="form-input" id="roomPrice" min="1000" step="100" value="8000" required>
+                            </div>
+                        </div>
+                        <div style="margin-top: 15px;">
+                            <button type="submit" class="btn btn-primary">
+                                在庫を登録・更新
+                            </button>
+                            <button type="button" class="btn" id="deleteButton" style="background: #dc3545; color: white; margin-left: 10px; display: none;">
+                                在庫を削除
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- 予約一覧タブ -->
+        <div id="reservationsTab" class="tab-content" style="display: none;">
+            <div class="card">
+                <h2 style="margin-bottom: 20px;">予約一覧</h2>
+                
+                <div id="reservationsList">
+                    <!-- 予約一覧がここに表示される -->
+                </div>
+                
+                <div id="noReservations" style="display: none; text-align: center; padding: 40px;">
+                    <p style="color: #666;">まだ予約はありません</p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="../../js/data.js"></script>
+    <script>
+        // 現在の月
+        let currentDate = new Date();
+        const hotelId = 'hotel_001'; // モックで固定
+
+        // タブ切り替え
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(c => c.style.display = 'none');
+                
+                this.classList.add('active');
+                document.getElementById(this.dataset.tab + 'Tab').style.display = 'block';
+            });
+        });
+
+        // 統計情報の更新
+        function updateStats() {
+            const reservations = getReservations().filter(r => r.hotelId === hotelId);
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            
+            const activeReservations = reservations.filter(r => r.status !== 'cancelled');
+            const upcoming = activeReservations.filter(r => new Date(r.checkInDate) >= today);
+            const totalRevenue = activeReservations.reduce((sum, r) => sum + r.price, 0);
+            
+            document.getElementById('totalReservations').textContent = reservations.length;
+            document.getElementById('upcomingReservations').textContent = upcoming.length;
+            document.getElementById('totalRevenue').textContent = '¥' + totalRevenue.toLocaleString();
+        }
+
+        // カレンダーの描画
+        function renderCalendar() {
+            const year = currentDate.getFullYear();
+            const month = currentDate.getMonth();
+            
+            document.getElementById('currentMonth').textContent = 
+                `${year}年${month + 1}月`;
+            
+            const firstDay = new Date(year, month, 1).getDay();
+            const lastDate = new Date(year, month + 1, 0).getDate();
+            
+            const grid = document.getElementById('calendarGrid');
+            grid.innerHTML = '';
+            
+            // 曜日ヘッダー
+            const weekDays = ['日', '月', '火', '水', '木', '金', '土'];
+            weekDays.forEach(day => {
+                const header = document.createElement('div');
+                header.style.fontWeight = 'bold';
+                header.style.textAlign = 'center';
+                header.textContent = day;
+                grid.appendChild(header);
+            });
+            
+            // 空白セル
+            for (let i = 0; i < firstDay; i++) {
+                grid.appendChild(document.createElement('div'));
+            }
+            
+            // 日付セル
+            const inventory = JSON.parse(localStorage.getItem('yadogacha_inventory') || '{}');
+            
+            for (let date = 1; date <= lastDate; date++) {
+                const cell = document.createElement('div');
+                cell.className = 'calendar-day';
+                
+                const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(date).padStart(2, '0')}`;
+                const dayInventory = inventory[hotelId]?.[dateStr];
+                
+                if (dayInventory) {
+                    cell.classList.add('has-inventory');
+                    cell.innerHTML = `
+                        <div class="day-number">${date}</div>
+                        <div class="day-info">${dayInventory.rooms}室</div>
+                    `;
+                } else {
+                    cell.innerHTML = `<div class="day-number">${date}</div>`;
+                }
+                
+                cell.addEventListener('click', () => {
+                    document.getElementById('inventoryDate').value = dateStr;
+                    if (dayInventory) {
+                        document.getElementById('roomCount').value = dayInventory.rooms;
+                        document.getElementById('roomPrice').value = dayInventory.price;
+                        document.getElementById('deleteButton').style.display = 'inline-block';
+                    } else {
+                        document.getElementById('roomCount').value = 1;
+                        document.getElementById('roomPrice').value = 8000;
+                        document.getElementById('deleteButton').style.display = 'none';
+                    }
+                });
+                
+                grid.appendChild(cell);
+            }
+        }
+
+        // 月の切り替え
+        document.getElementById('prevMonth').addEventListener('click', () => {
+            currentDate.setMonth(currentDate.getMonth() - 1);
+            renderCalendar();
+        });
+
+        document.getElementById('nextMonth').addEventListener('click', () => {
+            currentDate.setMonth(currentDate.getMonth() + 1);
+            renderCalendar();
+        });
+
+        // 在庫登録フォーム
+        document.getElementById('inventoryForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const date = document.getElementById('inventoryDate').value;
+            const rooms = parseInt(document.getElementById('roomCount').value);
+            const price = parseInt(document.getElementById('roomPrice').value);
+            
+            // 在庫データを保存
+            let inventory = JSON.parse(localStorage.getItem('yadogacha_inventory') || '{}');
+            if (!inventory[hotelId]) inventory[hotelId] = {};
+            
+            inventory[hotelId][date] = {
+                rooms: rooms,
+                price: price
+            };
+            
+            localStorage.setItem('yadogacha_inventory', JSON.stringify(inventory));
+            
+            alert('在庫を登録しました');
+            renderCalendar();
+            this.reset();
+            document.getElementById('deleteButton').style.display = 'none';
+        });
+
+        // 在庫削除ボタン
+        document.getElementById('deleteButton').addEventListener('click', function() {
+            const date = document.getElementById('inventoryDate').value;
+            
+            if (!date) {
+                alert('日付を選択してください');
+                return;
+            }
+            
+            if (confirm(`${date}の在庫を削除してもよろしいですか？`)) {
+                let inventory = JSON.parse(localStorage.getItem('yadogacha_inventory') || '{}');
+                
+                if (inventory[hotelId] && inventory[hotelId][date]) {
+                    delete inventory[hotelId][date];
+                    localStorage.setItem('yadogacha_inventory', JSON.stringify(inventory));
+                    
+                    alert('在庫を削除しました');
+                    renderCalendar();
+                    document.getElementById('inventoryForm').reset();
+                    document.getElementById('deleteButton').style.display = 'none';
+                }
+            }
+        });
+
+        // 予約一覧の表示
+        function renderReservations() {
+            const reservations = getReservations().filter(r => r.hotelId === hotelId);
+            const container = document.getElementById('reservationsList');
+            
+            if (reservations.length === 0) {
+                document.getElementById('noReservations').style.display = 'block';
+                container.style.display = 'none';
+            } else {
+                document.getElementById('noReservations').style.display = 'none';
+                container.style.display = 'block';
+                
+                container.innerHTML = reservations.map(r => {
+                    const checkInDate = new Date(r.checkInDate);
+                    const checkOutDate = new Date(r.checkInDate);
+                    checkOutDate.setDate(checkOutDate.getDate() + r.nights);
+                    
+                    return `
+                        <div class="reservation-card" data-reservation-id="${r.id}">
+                            <div class="reservation-header">
+                                <div>
+                                    <h4>${r.guestName}</h4>
+                                    <p style="color: #666; font-size: 0.9rem;">予約番号: ${r.id}</p>
+                                </div>
+                                <span class="reservation-status ${r.status === 'cancelled' ? 'status-cancelled' : 'status-revealed'}">
+                                    ${r.status === 'cancelled' ? 'キャンセル済み' : '確定'}
+                                </span>
+                            </div>
+                            <div style="margin-top: 15px; display: grid; gap: 8px; font-size: 0.95rem;">
+                                <div><strong>チェックイン:</strong> ${checkInDate.toLocaleDateString('ja-JP')}</div>
+                                <div><strong>チェックアウト:</strong> ${checkOutDate.toLocaleDateString('ja-JP')}</div>
+                                <div><strong>人数:</strong> ${r.guests}名</div>
+                                <div><strong>連絡先:</strong> ${r.phone} / ${r.email}</div>
+                                ${r.specialRequests ? `<div><strong>特別リクエスト:</strong> ${r.specialRequests}</div>` : ''}
+                            </div>
+                            ${r.status !== 'cancelled' ? `
+                                <div style="margin-top: 15px; text-align: right;">
+                                    <button class="btn cancel-reservation-btn" style="background: #dc3545; color: white; padding: 8px 20px; font-size: 0.9rem;" data-reservation-id="${r.id}">
+                                        予約をキャンセル
+                                    </button>
+                                </div>
+                            ` : ''}
+                        </div>
+                    `;
+                }).join('');
+            }
+        }
+
+        // 日付の最小値を今日に設定
+        document.getElementById('inventoryDate').min = new Date().toISOString().split('T')[0];
+
+        // 予約キャンセル機能
+        function setupCancelButtons() {
+            document.querySelectorAll('.cancel-reservation-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const reservationId = this.dataset.reservationId;
+                    
+                    if (confirm('この予約をキャンセルしてもよろしいですか？\nこの操作は取り消せません。')) {
+                        // 予約データを取得
+                        let reservations = getReservations();
+                        const reservationIndex = reservations.findIndex(r => r.id === reservationId);
+                        
+                        if (reservationIndex !== -1) {
+                            // ステータスをキャンセルに変更
+                            reservations[reservationIndex].status = 'cancelled';
+                            reservations[reservationIndex].cancelledAt = new Date().toISOString();
+                            reservations[reservationIndex].cancelledBy = 'hotel';
+                            
+                            // 保存
+                            localStorage.setItem('yadogacha_reservations', JSON.stringify(reservations));
+                            
+                            alert('予約をキャンセルしました');
+                            
+                            // 画面を更新
+                            updateStats();
+                            renderReservations();
+                            setupCancelButtons();
+                        }
+                    }
+                });
+            });
+        }
+
+        // 初期化
+        updateStats();
+        renderCalendar();
+        renderReservations();
+        setupCancelButtons();
+    </script>
+</body>
+</html>

@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>マイページ - 宿ガチャ</title>
+    <link rel="stylesheet" href="../../css/style.css">
+</head>
+<body>
+    <header class="header">
+        <div class="header-content">
+            <a href="../../index.html" class="logo">🏨 宿ガチャ</a>
+            <nav class="nav-links">
+                <a href="mypage.html" style="background: rgba(255,255,255,0.2);">マイページ</a>
+                <a href="../partner/dashboard.html">パートナー管理</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container">
+        <div class="card">
+            <h1 style="margin-bottom: 5px;">マイページ</h1>
+            <p style="color: #666;">user_001 さん</p>
+        </div>
+
+        <!-- タブナビゲーション -->
+        <div style="display: flex; gap: 10px; margin-bottom: 20px;">
+            <button class="btn btn-secondary tab-btn active" data-tab="upcoming">
+                今後の予約
+            </button>
+            <button class="btn btn-secondary tab-btn" data-tab="past">
+                過去の予約
+            </button>
+        </div>
+
+        <!-- 今後の予約 -->
+        <div id="upcomingTab" class="tab-content">
+            <div id="upcomingReservations" class="reservation-list">
+                <!-- 予約がここに表示される -->
+            </div>
+            <div id="noUpcomingReservations" style="display: none;">
+                <div class="card" style="text-align: center; padding: 60px 20px;">
+                    <div style="font-size: 4rem; margin-bottom: 20px;">📅</div>
+                    <h3 style="margin-bottom: 10px;">予約はありません</h3>
+                    <p style="color: #666; margin-bottom: 20px;">新しい宿ガチャを回してみましょう！</p>
+                    <button class="btn btn-primary" onclick="window.location.href='../../index.html'">
+                        宿ガチャを回す
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 過去の予約 -->
+        <div id="pastTab" class="tab-content" style="display: none;">
+            <div id="pastReservations" class="reservation-list">
+                <!-- 予約がここに表示される -->
+            </div>
+            <div id="noPastReservations" style="display: none;">
+                <div class="card" style="text-align: center; padding: 60px 20px;">
+                    <div style="font-size: 4rem; margin-bottom: 20px;">📝</div>
+                    <h3 style="margin-bottom: 10px;">過去の予約はありません</h3>
+                    <p style="color: #666;">宿ガチャを利用すると、ここに履歴が表示されます</p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="../../js/data.js"></script>
+    <script>
+        // タブ切り替え
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(c => c.style.display = 'none');
+                
+                this.classList.add('active');
+                document.getElementById(this.dataset.tab + 'Tab').style.display = 'block';
+            });
+        });
+
+        // 予約データを取得
+        const reservations = getReservations();
+        const hotels = getHotels();
+        const userId = getCurrentUser();
+        const userReservations = reservations.filter(r => r.userId === userId);
+
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+
+        // 今後の予約と過去の予約を分ける
+        const upcomingReservations = userReservations.filter(r => {
+            const checkInDate = new Date(r.checkInDate);
+            return checkInDate >= today;
+        }).sort((a, b) => new Date(a.checkInDate) - new Date(b.checkInDate));
+
+        const pastReservations = userReservations.filter(r => {
+            const checkInDate = new Date(r.checkInDate);
+            return checkInDate < today;
+        }).sort((a, b) => new Date(b.checkInDate) - new Date(a.checkInDate));
+
+        // 今後の予約を表示
+        if (upcomingReservations.length > 0) {
+            const upcomingContainer = document.getElementById('upcomingReservations');
+            upcomingReservations.forEach(reservation => {
+                const hotel = hotels.find(h => h.id === reservation.hotelId);
+                upcomingContainer.appendChild(createReservationCard(reservation, hotel, true));
+            });
+        } else {
+            document.getElementById('noUpcomingReservations').style.display = 'block';
+        }
+
+        // 過去の予約を表示
+        if (pastReservations.length > 0) {
+            const pastContainer = document.getElementById('pastReservations');
+            pastReservations.forEach(reservation => {
+                const hotel = hotels.find(h => h.id === reservation.hotelId);
+                pastContainer.appendChild(createReservationCard(reservation, hotel, false));
+            });
+        } else {
+            document.getElementById('noPastReservations').style.display = 'block';
+        }
+
+        // 予約カードを作成
+        function createReservationCard(reservation, hotel, isUpcoming) {
+            const card = document.createElement('div');
+            card.className = 'reservation-card';
+            
+            const checkInDate = new Date(reservation.checkInDate);
+            const checkOutDate = new Date(reservation.checkInDate);
+            checkOutDate.setDate(checkOutDate.getDate() + reservation.nights);
+            
+            const isPending = reservation.status === 'pending';
+            const revealDate = new Date(reservation.revealDate);
+            const now = new Date();
+            const shouldReveal = !isPending || now >= revealDate;
+
+            let cardContent = `
+                <div class="reservation-header">
+                    <div>
+                        <h3 style="margin-bottom: 5px;">${shouldReveal && hotel ? hotel.name : '🎁 当日発表予定'}</h3>
+                        <p style="color: #666; font-size: 0.9rem;">予約番号: ${reservation.id}</p>
+                    </div>
+                    <span class="reservation-status ${reservation.status === 'cancelled' ? 'status-cancelled' : isPending ? 'status-pending' : 'status-revealed'}">
+                        ${reservation.status === 'cancelled' ? 'キャンセル済み' : isPending ? '未発表' : '確定'}
+                    </span>
+                </div>
+                
+                <div style="margin-top: 15px; display: grid; gap: 8px; font-size: 0.95rem;">
+                    <div><strong>チェックイン:</strong> ${checkInDate.toLocaleDateString('ja-JP')}</div>
+                    <div><strong>チェックアウト:</strong> ${checkOutDate.toLocaleDateString('ja-JP')}</div>
+                    <div><strong>宿泊数:</strong> ${reservation.nights}泊</div>
+                    <div><strong>人数:</strong> ${reservation.guests}名</div>
+                    <div><strong>料金:</strong> ¥${reservation.price.toLocaleString()}</div>
+                </div>
+            `;
+
+            if (reservation.status === 'cancelled') {
+                cardContent += `
+                    <div style="margin-top: 15px; padding: 15px; background: #fff3cd; border-radius: 10px;">
+                        <p style="color: #856404; margin: 0;">この予約はキャンセルされました</p>
+                        ${reservation.cancelledAt ? `<p style="color: #856404; font-size: 0.9rem; margin-top: 5px;">キャンセル日: ${new Date(reservation.cancelledAt).toLocaleDateString('ja-JP')}</p>` : ''}
+                    </div>
+                `;
+            } else if (shouldReveal && hotel) {
+                cardContent += `
+                    <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #e9ecef;">
+                        <div style="display: grid; gap: 8px; font-size: 0.9rem; color: #666;">
+                            <div>📍 ${hotel.address}</div>
+                            <div>📞 ${hotel.phone}</div>
+                            <div>🕐 チェックイン: ${hotel.checkIn} / チェックアウト: ${hotel.checkOut}</div>
+                        </div>
+                    </div>
+                `;
+            } else if (isPending && isUpcoming) {
+                const daysUntilReveal = Math.ceil((revealDate - now) / (1000 * 60 * 60 * 24));
+                cardContent += `
+                    <div class="countdown" style="margin-top: 15px;">
+                        <p style="margin-bottom: 10px;">宿泊先発表まで</p>
+                        <div class="countdown-number">${daysUntilReveal}</div>
+                        <p>日</p>
+                    </div>
+                `;
+            }
+
+            card.innerHTML = cardContent;
+            return card;
+        }
+    </script>
+</body>
+</html>

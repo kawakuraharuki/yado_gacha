@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>予約情報入力 - 宿ガチャ</title>
+    <link rel="stylesheet" href="../../css/style.css">
+</head>
+<body>
+    <header class="header">
+        <div class="header-content">
+            <a href="../../index.html" class="logo">🏨 宿ガチャ</a>
+            <nav class="nav-links">
+                <a href="mypage.html">マイページ</a>
+                <a href="../partner/dashboard.html">パートナー管理</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container">
+        <div class="card">
+            <h1 style="text-align: center; margin-bottom: 30px;">予約情報を入力</h1>
+
+            <div id="planSummary" style="background: #f8f9fa; padding: 20px; border-radius: 10px; margin-bottom: 30px;">
+                <!-- プラン情報のサマリーがここに表示される -->
+            </div>
+
+            <form id="reservationForm">
+                <h3 style="margin-bottom: 20px;">宿泊者情報</h3>
+                
+                <div class="form-group">
+                    <label class="form-label" for="guestName">代表者氏名 <span style="color: red;">*</span></label>
+                    <input type="text" class="form-input" id="guestName" required placeholder="山田 太郎">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="guestNameKana">代表者氏名（カナ） <span style="color: red;">*</span></label>
+                    <input type="text" class="form-input" id="guestNameKana" required placeholder="ヤマダ タロウ">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="phone">電話番号 <span style="color: red;">*</span></label>
+                    <input type="tel" class="form-input" id="phone" required placeholder="090-1234-5678">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="email">メールアドレス <span style="color: red;">*</span></label>
+                    <input type="email" class="form-input" id="email" required placeholder="example@email.com">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="specialRequests">特別なリクエスト（任意）</label>
+                    <textarea class="form-input" id="specialRequests" rows="3" placeholder="アレルギー、記念日など"></textarea>
+                </div>
+
+                <div style="margin-top: 30px; padding: 20px; background: #fff3cd; border-radius: 10px;">
+                    <h4 style="margin-bottom: 10px;">⚠️ ご注意事項</h4>
+                    <ul style="font-size: 0.9rem; line-height: 1.6; color: #856404;">
+                        <li>予約確定後のキャンセルはできません</li>
+                        <li>「当日わかるガチャ」の場合、宿泊当日の正午に宿泊先が判明します</li>
+                        <li>すべての宿泊施設は品質基準をクリアしています</li>
+                    </ul>
+                </div>
+
+                <div style="margin-top: 30px;">
+                    <label style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
+                        <input type="checkbox" id="agreeTerms" style="width: 20px; height: 20px;">
+                        <span>利用規約とプライバシーポリシーに同意します</span>
+                    </label>
+                </div>
+
+                <button type="submit" class="btn btn-primary btn-block" style="margin-top: 30px;" id="submitButton" disabled>
+                    予約を確定する（決済なし）
+                </button>
+            </form>
+        </div>
+    </main>
+
+    <script src="../../js/data.js"></script>
+    <script>
+        const planData = JSON.parse(sessionStorage.getItem('planData'));
+        
+        if (!planData) {
+            window.location.href = '../../index.html';
+        }
+
+        // プラン情報のサマリー表示
+        const checkInDate = new Date(planData.checkInDate);
+        const checkOutDate = new Date(planData.checkInDate);
+        checkOutDate.setDate(checkOutDate.getDate() + parseInt(planData.nights));
+
+        document.getElementById('planSummary').innerHTML = `
+            <h3 style="margin-bottom: 15px;">${planData.planType === 'instant' ? '⚡ すぐわかるガチャ' : '🎁 当日わかるガチャ'}</h3>
+            <div style="display: flex; flex-wrap: wrap; gap: 20px; font-size: 0.95rem;">
+                <div><strong>エリア:</strong> ${planData.area}</div>
+                <div><strong>チェックイン:</strong> ${checkInDate.toLocaleDateString('ja-JP')}</div>
+                <div><strong>チェックアウト:</strong> ${checkOutDate.toLocaleDateString('ja-JP')}</div>
+                <div><strong>宿泊数:</strong> ${planData.nights}泊</div>
+                <div><strong>人数:</strong> ${planData.guests}名</div>
+            </div>
+            <div style="margin-top: 15px; font-size: 1.5rem; color: #f5576c; font-weight: bold;">
+                合計: ¥${planData.price.toLocaleString()}
+            </div>
+        `;
+
+        // 利用規約チェックボックスの監視
+        document.getElementById('agreeTerms').addEventListener('change', function() {
+            document.getElementById('submitButton').disabled = !this.checked;
+        });
+
+        // フォーム送信処理
+        document.getElementById('reservationForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            // ランダムにホテルを選択
+            const hotels = getHotels().filter(h => h.area === planData.area);
+            const selectedHotel = hotels[Math.floor(Math.random() * hotels.length)];
+
+            // 予約データの作成
+            const reservation = {
+                id: 'RES' + Date.now(),
+                userId: getCurrentUser(),
+                planType: planData.planType,
+                area: planData.area,
+                checkInDate: planData.checkInDate,
+                nights: parseInt(planData.nights),
+                guests: parseInt(planData.guests),
+                guestName: document.getElementById('guestName').value,
+                guestNameKana: document.getElementById('guestNameKana').value,
+                phone: document.getElementById('phone').value,
+                email: document.getElementById('email').value,
+                specialRequests: document.getElementById('specialRequests').value,
+                hotelId: selectedHotel.id,
+                price: planData.price,
+                status: planData.planType === 'instant' ? 'revealed' : 'pending',
+                createdAt: new Date().toISOString(),
+                revealDate: planData.planType === 'instant' ? new Date().toISOString() : checkInDate.toISOString()
+            };
+
+            // 予約を保存
+            saveReservation(reservation);
+
+            // セッションストレージに予約IDを保存
+            sessionStorage.setItem('latestReservationId', reservation.id);
+
+            // ガチャ結果ページへ遷移
+            window.location.href = 'gacha-result.html';
+        });
+    </script>
+</body>
+</html>

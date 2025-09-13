@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ガチャ結果 - 宿ガチャ</title>
+    <link rel="stylesheet" href="../../css/style.css">
+</head>
+<body>
+    <header class="header">
+        <div class="header-content">
+            <a href="../../index.html" class="logo">🏨 宿ガチャ</a>
+            <nav class="nav-links">
+                <a href="mypage.html">マイページ</a>
+                <a href="../partner/dashboard.html">パートナー管理</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container">
+        <!-- すぐわかるガチャの場合のアニメーション -->
+        <div id="gachaAnimation" class="gacha-container" style="display: none;">
+            <div class="gacha-box spinning">
+                <div class="question-mark">?</div>
+            </div>
+            <h2 style="color: #667eea;">ガチャを回しています...</h2>
+        </div>
+
+        <!-- 当日わかるガチャの場合の表示 -->
+        <div id="pendingResult" class="card" style="display: none;">
+            <div style="text-align: center; padding: 40px;">
+                <div style="font-size: 5rem; margin-bottom: 20px;">🎁</div>
+                <h1 style="color: #667eea; margin-bottom: 20px;">予約が完了しました！</h1>
+                <p style="font-size: 1.2rem; margin-bottom: 30px;">
+                    宿泊先は<span id="revealDate" style="color: #f5576c; font-weight: bold;"></span>に発表されます
+                </p>
+                <div class="countdown">
+                    <p style="margin-bottom: 10px;">発表まで</p>
+                    <div class="countdown-number" id="countdownDays">--</div>
+                    <p>日</p>
+                </div>
+                <button class="btn btn-primary" style="margin-top: 30px;" onclick="window.location.href='mypage.html'">
+                    マイページで詳細を確認
+                </button>
+            </div>
+        </div>
+
+        <!-- 結果表示 -->
+        <div id="resultContainer" class="result-container" style="display: none;">
+            <div class="card">
+                <h1 style="text-align: center; color: #667eea; margin-bottom: 30px;">
+                    🎉 おめでとうございます！
+                </h1>
+                
+                <img id="hotelImage" class="hotel-image" src="" alt="">
+                
+                <div class="hotel-info">
+                    <h2 id="hotelName"></h2>
+                    
+                    <div class="hotel-meta">
+                        <div class="meta-item">
+                            <span>📍</span>
+                            <span id="hotelAddress"></span>
+                        </div>
+                        <div class="meta-item">
+                            <span>📞</span>
+                            <span id="hotelPhone"></span>
+                        </div>
+                        <div class="meta-item">
+                            <span>🕐</span>
+                            <span>チェックイン: <span id="checkInTime"></span></span>
+                        </div>
+                        <div class="meta-item">
+                            <span>🕑</span>
+                            <span>チェックアウト: <span id="checkOutTime"></span></span>
+                        </div>
+                    </div>
+                    
+                    <p id="hotelDescription" style="margin-top: 20px; line-height: 1.8; color: #666;"></p>
+                    
+                    <div class="features-grid" id="featuresGrid">
+                        <!-- 特徴タグがここに表示される -->
+                    </div>
+                </div>
+            </div>
+
+            <div class="card" style="margin-top: 20px;">
+                <h3 style="margin-bottom: 15px;">📋 予約詳細</h3>
+                <div id="reservationDetails">
+                    <!-- 予約詳細がここに表示される -->
+                </div>
+            </div>
+
+            <div style="text-align: center; margin-top: 30px;">
+                <button class="btn btn-success" onclick="window.location.href='mypage.html'">
+                    マイページで予約を確認
+                </button>
+                <button class="btn btn-secondary" onclick="window.location.href='../../index.html'" style="margin-left: 10px;">
+                    トップページへ
+                </button>
+            </div>
+        </div>
+    </main>
+
+    <script src="../../js/data.js"></script>
+    <script>
+        const reservationId = sessionStorage.getItem('latestReservationId');
+        
+        if (!reservationId) {
+            window.location.href = '../../index.html';
+        }
+
+        // 予約情報を取得
+        const reservations = getReservations();
+        const reservation = reservations.find(r => r.id === reservationId);
+        
+        if (!reservation) {
+            window.location.href = '../../index.html';
+        }
+
+        // ホテル情報を取得
+        const hotels = getHotels();
+        const hotel = hotels.find(h => h.id === reservation.hotelId);
+
+        // 即座に結果を表示するか、当日まで待つか
+        if (reservation.planType === 'instant') {
+            // すぐわかるガチャの場合
+            showGachaAnimation();
+        } else {
+            // 当日わかるガチャの場合
+            showPendingResult();
+        }
+
+        function showGachaAnimation() {
+            document.getElementById('gachaAnimation').style.display = 'block';
+            
+            // 2秒後に結果を表示
+            setTimeout(() => {
+                document.getElementById('gachaAnimation').style.display = 'none';
+                showResult();
+            }, 2000);
+        }
+
+        function showPendingResult() {
+            document.getElementById('pendingResult').style.display = 'block';
+            
+            const revealDate = new Date(reservation.revealDate);
+            document.getElementById('revealDate').textContent = revealDate.toLocaleDateString('ja-JP');
+            
+            // カウントダウン計算
+            const now = new Date();
+            const daysUntilReveal = Math.ceil((revealDate - now) / (1000 * 60 * 60 * 24));
+            document.getElementById('countdownDays').textContent = daysUntilReveal;
+        }
+
+        function showResult() {
+            document.getElementById('resultContainer').style.display = 'block';
+            
+            // ホテル情報を表示
+            document.getElementById('hotelImage').src = hotel.image;
+            document.getElementById('hotelImage').alt = hotel.name;
+            document.getElementById('hotelName').textContent = hotel.name;
+            document.getElementById('hotelAddress').textContent = hotel.address;
+            document.getElementById('hotelPhone').textContent = hotel.phone;
+            document.getElementById('checkInTime').textContent = hotel.checkIn;
+            document.getElementById('checkOutTime').textContent = hotel.checkOut;
+            document.getElementById('hotelDescription').textContent = hotel.description;
+            
+            // 特徴タグ
+            const featuresGrid = document.getElementById('featuresGrid');
+            hotel.features.forEach(feature => {
+                const tag = document.createElement('span');
+                tag.className = 'feature-tag';
+                tag.textContent = feature;
+                featuresGrid.appendChild(tag);
+            });
+            
+            // 予約詳細
+            const checkInDate = new Date(reservation.checkInDate);
+            const checkOutDate = new Date(reservation.checkInDate);
+            checkOutDate.setDate(checkOutDate.getDate() + reservation.nights);
+            
+            document.getElementById('reservationDetails').innerHTML = `
+                <div style="display: grid; gap: 10px; font-size: 0.95rem;">
+                    <div><strong>予約番号:</strong> ${reservation.id}</div>
+                    <div><strong>宿泊者名:</strong> ${reservation.guestName}</div>
+                    <div><strong>チェックイン:</strong> ${checkInDate.toLocaleDateString('ja-JP')}</div>
+                    <div><strong>チェックアウト:</strong> ${checkOutDate.toLocaleDateString('ja-JP')}</div>
+                    <div><strong>宿泊数:</strong> ${reservation.nights}泊</div>
+                    <div><strong>人数:</strong> ${reservation.guests}名</div>
+                    <div><strong>料金:</strong> ¥${reservation.price.toLocaleString()}</div>
+                </div>
+            `;
+        }
+    </script>
+</body>
+</html>

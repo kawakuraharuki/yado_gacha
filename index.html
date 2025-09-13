@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>宿ガチャ - トップページ</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <header class="header">
+        <div class="header-content">
+            <a href="index.html" class="logo">🏨 宿ガチャ</a>
+            <nav class="nav-links">
+                <a href="pages/user/mypage.html">マイページ</a>
+                <a href="pages/partner/dashboard.html">パートナー管理</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container">
+        <div class="search-form">
+            <div class="search-header">
+                <h1>今日の運命の宿を見つけよう！</h1>
+                <p>エリアと日程を選んで、ワクワクする宿泊体験を</p>
+            </div>
+
+            <form id="searchForm">
+                <div class="form-group">
+                    <label class="form-label" for="area">エリア</label>
+                    <select class="form-select" id="area" required>
+                        <option value="">エリアを選択してください</option>
+                        <option value="東京">東京</option>
+                        <option value="京都">京都</option>
+                        <option value="沖縄">沖縄</option>
+                        <option value="北海道">北海道</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="checkInDate">チェックイン日</label>
+                    <input type="date" class="form-input" id="checkInDate" required>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="nights">宿泊数</label>
+                    <select class="form-select" id="nights" required>
+                        <option value="1">1泊</option>
+                        <option value="2">2泊</option>
+                        <option value="3">3泊</option>
+                        <option value="4">4泊</option>
+                        <option value="5">5泊</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="guests">人数</label>
+                    <select class="form-select" id="guests" required>
+                        <option value="1">1名</option>
+                        <option value="2">2名</option>
+                        <option value="3">3名</option>
+                        <option value="4">4名</option>
+                    </select>
+                </div>
+
+                <button type="submit" class="btn btn-primary btn-block">
+                    ガチャプランを見る
+                </button>
+            </form>
+        </div>
+
+        <div class="card" style="margin-top: 40px;">
+            <h2 style="text-align: center; margin-bottom: 20px;">🎲 宿ガチャの楽しみ方</h2>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-top: 30px;">
+                <div style="text-align: center;">
+                    <div style="font-size: 3rem; margin-bottom: 10px;">🔍</div>
+                    <h3>1. 条件を選ぶ</h3>
+                    <p style="color: #666;">エリアと日程を選択</p>
+                </div>
+                <div style="text-align: center;">
+                    <div style="font-size: 3rem; margin-bottom: 10px;">🎰</div>
+                    <h3>2. ガチャを回す</h3>
+                    <p style="color: #666;">2つのプランから選択</p>
+                </div>
+                <div style="text-align: center;">
+                    <div style="font-size: 3rem; margin-bottom: 10px;">✨</div>
+                    <h3>3. 結果を楽しむ</h3>
+                    <p style="color: #666;">素敵な宿との出会い</p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="js/data.js"></script>
+    <script>
+        // 日付の最小値を今日に設定
+        document.getElementById('checkInDate').min = new Date().toISOString().split('T')[0];
+
+        // フォーム送信処理
+        document.getElementById('searchForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // 検索条件を保存
+            const searchParams = {
+                area: document.getElementById('area').value,
+                checkInDate: document.getElementById('checkInDate').value,
+                nights: document.getElementById('nights').value,
+                guests: document.getElementById('guests').value
+            };
+            
+            sessionStorage.setItem('searchParams', JSON.stringify(searchParams));
+            
+            // プラン選択ページへ遷移
+            window.location.href = 'pages/user/plan-select.html';
+        });
+    </script>
+</body>
+</html>
