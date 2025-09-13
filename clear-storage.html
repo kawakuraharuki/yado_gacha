@@ -9,6 +9,7 @@
     
     <button onclick="clearAll()">全データをクリア</button>
     <button onclick="clearHotels()">ホテルデータのみクリア</button>
+    <button onclick="clearReservations()">予約履歴をクリア</button>
     <button onclick="showData()">現在のデータを表示</button>
     
     <div id="result" style="margin-top: 20px; padding: 20px; background: #f0f0f0;"></div>
@@ -22,6 +23,12 @@
         function clearHotels() {
             localStorage.removeItem('yadogacha_hotels');
             document.getElementById('result').innerHTML = '<p style="color: green;">ホテルデータをクリアしました。</p>';
+        }
+        
+        function clearReservations() {
+            localStorage.removeItem('yadogacha_reservations');
+            document.getElementById('result').innerHTML = '<p style="color: green;">予約履歴をクリアしました。</p>';
+            setTimeout(() => showData(), 1000);
         }
         
         function showData() {

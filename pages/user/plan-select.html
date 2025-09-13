@@ -46,6 +46,13 @@
                     <span>管理画面</span>
                 </a>
             </div>
+            
+            <div class="menu-footer">
+                <button class="logout-button" onclick="handleLogout()">
+                    <span class="menu-item-icon">🚪</span>
+                    <span>ログアウト</span>
+                </button>
+            </div>
         </div>
     </div>
 
@@ -151,7 +158,7 @@
                 
                 const button = document.getElementById('confirmButton');
                 button.disabled = false;
-                button.textContent = this.querySelector('.plan-name').textContent + 'で予約する';
+                button.textContent = 'ガチャを始める';
             });
         });
 
@@ -159,14 +166,48 @@
         document.getElementById('confirmButton').addEventListener('click', function() {
             if (!selectedPlan) return;
 
-            const planData = {
-                ...searchParams,
+            // ガチャを開始（個人情報入力をスキップして直接結果へ）
+            const hotels = getHotelsByArea(searchParams.area);
+            
+            if (hotels.length === 0) {
+                alert(`申し訳ございません。${searchParams.area}のホテルが見つかりません。`);
+                return;
+            }
+            
+            const selectedHotel = hotels[Math.floor(Math.random() * hotels.length)];
+            
+            // 予約データの作成（ゲスト情報はデフォルト値を使用）
+            const reservation = {
+                id: 'RES' + Date.now(),
+                userId: getCurrentUser(),
                 planType: selectedPlan,
-                price: selectedPlan === 'instant' ? instantPrice : surprisePrice
+                area: searchParams.area,
+                checkInDate: searchParams.checkInDate,
+                nights: parseInt(searchParams.nights),
+                guests: parseInt(searchParams.guests),
+                guestName: 'ゲスト様',
+                guestNameKana: 'ゲストサマ',
+                phone: '000-0000-0000',
+                email: 'guest@example.com',
+                specialRequests: '',
+                hotelId: selectedHotel.id,
+                price: selectedPlan === 'instant' ? instantPrice : surprisePrice,
+                status: selectedPlan === 'instant' ? 'revealed' : 'pending',
+                createdAt: new Date().toISOString(),
+                revealDate: selectedPlan === 'instant' 
+                    ? new Date().toISOString() 
+                    : new Date(searchParams.checkInDate).toISOString(),
+                attempts: 1 // ガチャ回数を記録
             };
 
-            sessionStorage.setItem('planData', JSON.stringify(planData));
-            window.location.href = 'reservation.html';
+            // 予約を保存
+            saveReservation(reservation);
+
+            // セッションストレージに予約IDを保存
+            sessionStorage.setItem('latestReservationId', reservation.id);
+
+            // ガチャ結果ページへ直接遷移
+            window.location.href = 'gacha-result.html';
         });
     </script>
 </body>

@@ -46,6 +46,13 @@
                     <span>管理画面</span>
                 </a>
             </div>
+            
+            <div class="menu-footer">
+                <button class="logout-button" onclick="handleLogout()">
+                    <span class="menu-item-icon">🚪</span>
+                    <span>ログアウト</span>
+                </button>
+            </div>
         </div>
     </div>
 
@@ -184,6 +191,7 @@
                     <div><strong>宿泊数:</strong> ${reservation.nights}泊</div>
                     <div><strong>人数:</strong> ${reservation.guests}名</div>
                     <div><strong>料金:</strong> ¥${reservation.price.toLocaleString()}</div>
+                    ${reservation.attempts > 1 ? `<div style="color: #f5576c;"><strong>ガチャ回数:</strong> ${reservation.attempts}回</div>` : ''}
                 </div>
             `;
 

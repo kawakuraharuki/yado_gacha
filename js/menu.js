@@ -35,5 +35,22 @@ function initMenu() {
     }
 }
 
+// ログアウト処理
+function handleLogout() {
+    if (confirm('ログアウトしますか？')) {
+        // ローカルストレージをクリア
+        localStorage.removeItem('yadogacha_current_user');
+        // トップページへリダイレクト
+        // 現在のパスに基づいて相対パスを計算
+        const pathSegments = window.location.pathname.split('/');
+        const depth = pathSegments.filter(seg => seg && seg !== 'index.html').length - 1;
+        const basePath = depth > 0 ? '../'.repeat(depth) : './';
+        window.location.href = basePath + 'index.html';
+    }
+}
+
+// グローバルに公開
+window.handleLogout = handleLogout;
+
 // ページ読み込み時に初期化
 document.addEventListener('DOMContentLoaded', initMenu);

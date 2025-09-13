@@ -5,33 +5,45 @@
 }
 
 :root {
-    --primary-color: #667eea;
-    --secondary-color: #764ba2;
-    --accent-color: #f5576c;
-    --success-color: #28a745;
-    --text-dark: #333;
-    --text-light: #666;
-    --bg-light: #f8f9fa;
-    --border-color: #e9ecef;
+    /* Light Theme with Dark Accents */
+    --bg-dark: #FFFFFF;
+    --surface-dark: #F9FAFB;
+    --border-dark: #E5E7EB;
+    --text-primary: #111827;
+    --text-secondary: #6B7280;
+    --primary-color: #22D3EE;
+    --accent-color: #F43F5E;
+    --gold-accent: #D4AF37;
+    --success-color: #10B981;
+    --warning-color: #F59E0B;
+    --error-color: #EF4444;
     --shadow: 0 10px 30px rgba(0,0,0,0.1);
+    --shadow-light: 0 4px 20px rgba(0,0,0,0.05);
+    
+    /* Legacy variables for compatibility */
+    --text-dark: #111827;
+    --text-light: #6B7280;
+    --bg-light: #F9FAFB;
+    --border-color: #E5E7EB;
 }
 
 body {
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Hiragino Sans', 'Hiragino Kaku Gothic ProN', 'Yu Gothic', sans-serif;
-    background: #f5f5f5;
+    background: var(--bg-dark);
     min-height: 100vh;
-    color: var(--text-dark);
+    color: var(--text-primary);
 }
 
 /* ヘッダー */
 .header {
-    background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
-    color: white;
+    background: white;
+    color: var(--text-primary);
     padding: 20px 0;
     position: sticky;
     top: 0;
     z-index: 100;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    box-shadow: var(--shadow-light);
+    border-bottom: 1px solid var(--border-dark);
 }
 
 .header-content {
@@ -53,7 +65,12 @@ body {
     font-size: 1.5rem;
     font-weight: bold;
     text-decoration: none;
-    color: white;
+    color: var(--text-primary);
+    transition: color 0.3s;
+}
+
+.logo:hover {
+    color: var(--primary-color);
 }
 
 .nav-links {
@@ -62,22 +79,25 @@ body {
 }
 
 .nav-links a {
-    color: white;
+    color: var(--text-primary);
     text-decoration: none;
     padding: 8px 16px;
     border-radius: 20px;
-    transition: background 0.3s;
+    transition: all 0.3s;
+    border: 1px solid transparent;
 }
 
 .nav-links a:hover {
-    background: rgba(255,255,255,0.2);
+    background: var(--surface-dark);
+    border-color: var(--primary-color);
+    color: var(--primary-color);
 }
 
 /* ハンバーガーメニュー */
 .menu-button {
-    background: none;
-    border: none;
-    color: white;
+    background: white;
+    border: 1px solid var(--border-dark);
+    color: var(--text-primary);
     font-size: 1.5rem;
     cursor: pointer;
     padding: 5px;
@@ -87,13 +107,15 @@ body {
     width: 40px;
     height: 40px;
     border-radius: 8px;
-    transition: background 0.3s;
+    transition: all 0.3s;
     margin-right: 10px;
     flex-shrink: 0;
 }
 
 .menu-button:hover {
-    background: rgba(255,255,255,0.2);
+    background: var(--bg-light);
+    border-color: var(--primary-color);
+    color: var(--primary-color);
 }
 
 /* モーダルメニュー */
@@ -104,7 +126,7 @@ body {
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0,0,0,0.5);
+    background: rgba(0,0,0,0.8);
     z-index: 1000;
     animation: fadeIn 0.3s ease;
 }
@@ -120,8 +142,10 @@ body {
     width: 300px;
     height: 100%;
     background: white;
-    box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+    box-shadow: var(--shadow);
     animation: slideIn 0.3s ease;
+    padding-bottom: 80px; /* ログアウトボタン分のスペース */
+    border-right: 1px solid var(--border-dark);
 }
 
 @keyframes slideIn {
@@ -130,18 +154,19 @@ body {
 }
 
 .menu-header {
-    background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
-    color: white;
+    background: var(--bg-light);
+    color: var(--text-primary);
     padding: 20px;
     display: flex;
     justify-content: space-between;
     align-items: center;
+    border-bottom: 1px solid var(--border-dark);
 }
 
 .menu-close {
     background: none;
-    border: none;
-    color: white;
+    border: 1px solid var(--border-dark);
+    color: var(--text-primary);
     font-size: 1.5rem;
     cursor: pointer;
     padding: 5px;
@@ -151,11 +176,13 @@ body {
     align-items: center;
     justify-content: center;
     border-radius: 8px;
-    transition: background 0.3s;
+    transition: all 0.3s;
 }
 
 .menu-close:hover {
-    background: rgba(255,255,255,0.2);
+    background: var(--bg-light);
+    color: var(--accent-color);
+    border-color: var(--accent-color);
 }
 
 .menu-section {
@@ -172,7 +199,7 @@ body {
 .menu-item {
     display: block;
     padding: 12px 20px;
-    color: var(--text-dark);
+    color: var(--text-primary);
     text-decoration: none;
     border-radius: 8px;
     transition: all 0.3s;
@@ -180,15 +207,51 @@ body {
     display: flex;
     align-items: center;
     gap: 10px;
+    border: 1px solid transparent;
 }
 
 .menu-item:hover {
     background: var(--bg-light);
+    border-color: var(--primary-color);
+    color: var(--primary-color);
     transform: translateX(5px);
 }
 
 .menu-item-icon {
     font-size: 1.2rem;
+}
+
+.menu-footer {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 20px;
+    border-top: 1px solid var(--border-dark);
+    background: white;
+}
+
+.logout-button {
+    width: 100%;
+    padding: 15px 20px;
+    border: 1px solid var(--accent-color);
+    background: transparent;
+    color: var(--accent-color);
+    border-radius: 10px;
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    transition: all 0.3s;
+}
+
+.logout-button:hover {
+    background: var(--accent-color);
+    color: var(--text-primary);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(244, 63, 94, 0.4);
 }
 
 /* レスポンシブ調整 */
@@ -220,6 +283,7 @@ body {
     padding: 30px;
     margin-bottom: 20px;
     box-shadow: var(--shadow);
+    border: 1px solid var(--border-dark);
 }
 
 /* フォーム要素 */
@@ -231,23 +295,27 @@ body {
     display: block;
     margin-bottom: 8px;
     font-weight: bold;
-    color: var(--text-dark);
+    color: var(--text-primary);
 }
 
 .form-input,
 .form-select {
     width: 100%;
     padding: 12px;
-    border: 2px solid var(--border-color);
+    border: 2px solid var(--border-dark);
     border-radius: 8px;
     font-size: 16px;
-    transition: border-color 0.3s;
+    transition: all 0.3s;
+    background: white;
+    color: var(--text-primary);
 }
 
 .form-input:focus,
 .form-select:focus {
     outline: none;
     border-color: var(--primary-color);
+    background: white;
+    box-shadow: 0 0 0 3px rgba(34, 211, 238, 0.1);
 }
 
 /* ボタン */
@@ -265,24 +333,72 @@ body {
 }
 
 .btn-primary {
-    background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+    background: var(--primary-color);
     color: white;
-    box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+    box-shadow: 0 5px 15px rgba(34, 211, 238, 0.2);
+    border: 1px solid var(--primary-color);
+    font-weight: 600;
 }
 
 .btn-primary:hover {
     transform: translateY(-2px);
-    box-shadow: 0 8px 20px rgba(102, 126, 234, 0.5);
+    box-shadow: 0 8px 20px rgba(34, 211, 238, 0.3);
+    background: var(--primary-color);
+    filter: brightness(1.1);
 }
 
 .btn-secondary {
+    background: transparent;
+    color: var(--text-primary);
+    border: 1px solid var(--border-dark);
+}
+
+.btn-secondary:hover {
     background: var(--bg-light);
-    color: var(--text-dark);
+    border-color: var(--text-primary);
+    transform: translateY(-2px);
 }
 
 .btn-success {
     background: var(--success-color);
     color: white;
+    border: 1px solid var(--success-color);
+    font-weight: 600;
+}
+
+.btn-success:hover {
+    background: var(--success-color);
+    filter: brightness(1.1);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(16, 185, 129, 0.2);
+}
+
+.btn-warning {
+    background: var(--gold-accent);
+    border: 1px solid var(--gold-accent);
+    color: white;
+    font-weight: 600;
+}
+
+.btn-warning:hover {
+    background: var(--gold-accent);
+    filter: brightness(1.1);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(212, 175, 55, 0.2);
+}
+
+.btn-info {
+    background: var(--primary-color);
+    border: 1px solid var(--primary-color);
+    color: white;
+    font-weight: 600;
+}
+
+.btn-info:hover {
+    background: var(--primary-color);
+    filter: brightness(1.1);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(34, 211, 238, 0.3);
 }
 
 .btn-block {
@@ -311,6 +427,53 @@ body {
     color: var(--text-light);
 }
 
+/* インパクトタイトルのスタイル */
+.impact-title {
+    font-size: 3rem !important;
+    font-weight: 900;
+    line-height: 1.3;
+    margin-bottom: 20px !important;
+    letter-spacing: 0.05em;
+}
+
+.impact-text-gradient {
+    color: #667eea;
+    text-shadow: 
+        1px 1px 0 #fff,
+        -1px -1px 0 #fff,
+        1px -1px 0 #fff,
+        -1px 1px 0 #fff,
+        2px 2px 3px rgba(0,0,0,0.2);
+    font-weight: 900;
+}
+
+.impact-text-highlight {
+    color: #f5576c;
+    font-size: 3.5rem;
+    display: inline-block;
+    text-shadow: 
+        2px 2px 0 #fff,
+        -2px -2px 0 #fff,
+        2px -2px 0 #fff,
+        -2px 2px 0 #fff,
+        3px 3px 5px rgba(0,0,0,0.3);
+    font-weight: 900;
+    position: relative;
+}
+
+
+/* モバイル対応 */
+@media (max-width: 768px) {
+    .impact-title {
+        font-size: 2rem !important;
+    }
+    .impact-text-highlight {
+        font-size: 2.3rem;
+        display: block;
+        margin-top: 5px;
+    }
+}
+
 /* プラン選択 */
 .plan-grid {
     display: grid;
@@ -320,13 +483,14 @@ body {
 }
 
 .plan-card {
-    border: 2px solid var(--border-color);
+    border: 2px solid var(--border-dark);
     border-radius: 15px;
     padding: 30px;
     text-align: center;
     transition: all 0.3s;
     cursor: pointer;
     position: relative;
+    background: white;
 }
 
 .plan-card:hover {
@@ -337,18 +501,20 @@ body {
 
 .plan-card.selected {
     border-color: var(--primary-color);
-    background: linear-gradient(to bottom, rgba(102, 126, 234, 0.05), rgba(118, 75, 162, 0.05));
+    background: var(--bg-light);
+    box-shadow: 0 0 0 3px rgba(34, 211, 238, 0.2);
 }
 
 .plan-icon {
     font-size: 3rem;
     margin-bottom: 15px;
+    filter: drop-shadow(0 0 10px currentColor);
 }
 
 .plan-name {
     font-size: 1.5rem;
     margin-bottom: 10px;
-    color: var(--text-dark);
+    color: var(--text-primary);
 }
 
 .plan-price {
@@ -359,52 +525,30 @@ body {
 }
 
 .plan-description {
-    color: var(--text-light);
+    color: var(--text-secondary);
     line-height: 1.6;
 }
 
 /* ガチャアニメーション */
-.gacha-container {
-    text-align: center;
-    padding: 50px 0;
-}
-
-.gacha-box {
-    width: 250px;
-    height: 250px;
-    margin: 0 auto 30px;
-    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-    border-radius: 20px;
+.gacha-fullscreen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: #000;
     display: flex;
     align-items: center;
     justify-content: center;
-    position: relative;
-    overflow: hidden;
-    box-shadow: 0 15px 40px rgba(0,0,0,0.2);
+    z-index: 9999;
 }
 
-.gacha-box.spinning {
-    animation: spin 1s ease-in-out;
+.gacha-video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
 }
 
-@keyframes spin {
-    0% { transform: rotate(0deg) scale(1); }
-    50% { transform: rotate(180deg) scale(1.1); }
-    100% { transform: rotate(360deg) scale(1); }
-}
-
-.question-mark {
-    font-size: 120px;
-    color: white;
-    font-weight: bold;
-    animation: pulse 2s infinite;
-}
-
-@keyframes pulse {
-    0% { transform: scale(1); }
-    50% { transform: scale(1.1); }
-    100% { transform: scale(1); }
-}
 
 /* 結果表示 */
 .result-container {
@@ -427,6 +571,67 @@ body {
 .hotel-info h2 {
     font-size: 2rem;
     margin-bottom: 15px;
+}
+
+/* 特別なホテルの演出 */
+.special-badge {
+    display: inline-block;
+    background: linear-gradient(135deg, var(--gold-accent) 0%, #F59E0B 100%);
+    color: white;
+    padding: 5px 15px;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    font-weight: bold;
+    margin-left: 10px;
+    animation: shine 2s infinite;
+}
+
+@keyframes shine {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+}
+
+/* ジャックポット演出 */
+.jackpot-text {
+    font-size: 2.5rem;
+    font-weight: bold;
+    background: linear-gradient(45deg, #FFD700, #FFA500, #FF6347, #FF1493, #9400D3, #4B0082, #FFD700);
+    background-size: 200% 200%;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: rainbow 3s ease-in-out infinite, glow 2s ease-in-out infinite;
+    text-shadow: 0 0 30px rgba(255, 215, 0, 0.5);
+}
+
+.jackpot-animation {
+    animation: jackpotBounce 1s ease-out;
+}
+
+@keyframes rainbow {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+@keyframes glow {
+    0%, 100% { 
+        filter: drop-shadow(0 0 20px rgba(255, 215, 0, 0.8)) 
+                drop-shadow(0 0 40px rgba(255, 140, 0, 0.6));
+    }
+    50% { 
+        filter: drop-shadow(0 0 30px rgba(255, 215, 0, 1)) 
+                drop-shadow(0 0 60px rgba(255, 140, 0, 0.8));
+    }
+}
+
+@keyframes jackpotBounce {
+    0% { transform: scale(0) rotate(0deg); }
+    50% { transform: scale(1.2) rotate(5deg); }
+    70% { transform: scale(0.9) rotate(-3deg); }
+    85% { transform: scale(1.05) rotate(1deg); }
+    100% { transform: scale(1) rotate(0deg); }
 }
 
 .hotel-meta {
@@ -492,32 +697,38 @@ body {
 }
 
 .status-pending {
-    background: #ffeaa7;
-    color: #d63031;
+    background: #FEF3C7;
+    color: #92400E;
+    border: 1px solid #F59E0B;
 }
 
 .status-revealed {
-    background: #55efc4;
-    color: #00b894;
+    background: #D1FAE5;
+    color: #065F46;
+    border: 1px solid #10B981;
 }
 
 .status-cancelled {
-    background: #fab1a0;
-    color: #d63031;
+    background: #FEE2E2;
+    color: #991B1B;
+    border: 1px solid #EF4444;
 }
 
 .countdown {
     text-align: center;
     padding: 20px;
-    background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+    background: var(--bg-light);
     border-radius: 10px;
-    color: white;
+    color: var(--text-primary);
     margin-top: 15px;
+    border: 1px solid var(--border-dark);
 }
 
 .countdown-number {
     font-size: 3rem;
     font-weight: bold;
+    color: var(--primary-color);
+    text-shadow: 0 0 20px rgba(34, 211, 238, 0.5);
 }
 
 /* レスポンシブ */

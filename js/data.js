@@ -10,8 +10,8 @@ const mockHotels = [
         checkIn: "15:00",
         checkOut: "11:00",
         price: {
-            instant: 12000,
-            surprise: 8000
+            instant: 10000,
+            surprise: 5000
         },
         description: "東京湾を一望できる絶景ホテル。お台場の中心に位置し、観光にも便利。",
         features: ["オーシャンビュー", "大浴場", "朝食ビュッフェ", "Wi-Fi無料", "駐車場"],
@@ -28,8 +28,8 @@ const mockHotels = [
         checkIn: "16:00",
         checkOut: "10:00",
         price: {
-            instant: 15000,
-            surprise: 10000
+            instant: 10000,
+            surprise: 5000
         },
         description: "浅草寺から徒歩5分。純和風の客室で日本の伝統を体験できます。",
         features: ["和室", "温泉", "懐石料理", "浴衣貸出", "日本庭園"],
@@ -46,8 +46,8 @@ const mockHotels = [
         checkIn: "14:00",
         checkOut: "11:00",
         price: {
-            instant: 18000,
-            surprise: 12000
+            instant: 10000,
+            surprise: 5000
         },
         description: "箱根の山々に囲まれた温泉リゾート。絶景と温泉を満喫できます。",
         features: ["露天風呂", "スパ", "懐石料理", "送迎バス", "貸切風呂"],
@@ -64,8 +64,8 @@ const mockHotels = [
         checkIn: "15:00",
         checkOut: "10:00",
         price: {
-            instant: 14000,
-            surprise: 9500
+            instant: 10000,
+            surprise: 5000
         },
         description: "成田空港からアクセス抜群。早朝・深夜便にも対応した便利なホテル。",
         features: ["空港送迎", "大浴場", "24時間対応", "コインランドリー", "ビジネスセンター"],
@@ -82,8 +82,8 @@ const mockHotels = [
         checkIn: "15:00",
         checkOut: "11:00",
         price: {
-            instant: 16000,
-            surprise: 11000
+            instant: 10000,
+            surprise: 5000
         },
         description: "大宮駅から徒歩5分。ビジネスと観光の拠点に最適なホテル。",
         features: ["駅近", "ビジネスセンター", "フィットネス", "レストラン", "宿泊者用ラウンジ"],
@@ -100,8 +100,8 @@ const mockHotels = [
         checkIn: "14:00",
         checkOut: "11:00",
         price: {
-            instant: 8000,
-            surprise: 5500
+            instant: 10000,
+            surprise: 5000
         },
         description: "水戸駅直結。偉島公園やアクアワールド大洋へのアクセスも便利。",
         features: ["朝食付き", "大浴場", "コインランドリー", "観光案内", "駅直結"],
@@ -118,8 +118,8 @@ const mockHotels = [
         checkIn: "15:00",
         checkOut: "11:00",
         price: {
-            instant: 13000,
-            surprise: 9000
+            instant: 10000,
+            surprise: 5000
         },
         description: "世界遺産日光の社寺を巡る拠点。歴史と自然を満喫できるリゾート。",
         features: ["温泉", "世界遺産ツアー", "和食レストラン", "送迎サービス", "庭園"],
@@ -136,13 +136,31 @@ const mockHotels = [
         checkIn: "15:00",
         checkOut: "10:00",
         price: {
-            instant: 20000,
-            surprise: 14000
+            instant: 10000,
+            surprise: 5000
         },
         description: "日本三名泉の一つ草津温泉。湯畑での温泉街歩きも楽しめる温泉リゾート。",
         features: ["名湯草津の湯", "露天風呂", "湯畑散策", "伝統工芸体験", "和会席料理"],
         image: "assets/images/hotels/hotel_008.jpg",
         placeholder: "https://via.placeholder.com/800x400/9370db/ffffff?text=草津温泉リゾート"
+    },
+    {
+        id: "hotel_009",
+        name: "下町ビジネスホテル 昭和館",
+        type: "ビジネスホテル",
+        area: "東京都",
+        address: "東京都足立区千住3-45-6",
+        phone: "03-3456-7890",
+        checkIn: "15:00",
+        checkOut: "10:00",
+        price: {
+            instant: 10000,
+            surprise: 5000
+        },
+        description: "昭和の雰囲気が残る下町のビジネスホテル。レトロな内装と人情味あふれるサービスが特徴。",
+        features: ["格安料金", "大浴場", "コインランドリー", "喫煙可", "駅から徒歩8分"],
+        image: "assets/images/hotels/hotel_009.jpg",
+        placeholder: "https://via.placeholder.com/800x400/8B7355/ffffff?text=下町ビジネスホテル+昭和館"
     }
 ];
 
@@ -151,10 +169,8 @@ const areas = ["東京都", "神奈川県", "千葉県", "埼玉県", "茨城県
 
 // ローカルストレージの初期化
 function initializeData() {
-    // ホテルデータの保存
-    if (!localStorage.getItem('yadogacha_hotels')) {
-        localStorage.setItem('yadogacha_hotels', JSON.stringify(mockHotels));
-    }
+    // ホテルデータの保存（常に最新のデータで更新）
+    localStorage.setItem('yadogacha_hotels', JSON.stringify(mockHotels));
     
     // 予約データの初期化
     if (!localStorage.getItem('yadogacha_reservations')) {

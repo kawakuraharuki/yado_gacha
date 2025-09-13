@@ -46,16 +46,23 @@
                     <span>管理画面</span>
                 </a>
             </div>
+            
+            <div class="menu-footer">
+                <button class="logout-button" onclick="handleLogout()">
+                    <span class="menu-item-icon">🚪</span>
+                    <span>ログアウト</span>
+                </button>
+            </div>
         </div>
     </div>
 
     <main class="container">
-        <!-- すぐわかるガチャの場合のアニメーション -->
-        <div id="gachaAnimation" class="gacha-container" style="display: none;">
-            <div class="gacha-box spinning">
-                <div class="question-mark">?</div>
-            </div>
-            <h2 style="color: #667eea;">ガチャを回しています...</h2>
+        <!-- ガチャ演出動画 -->
+        <div id="gachaAnimation" class="gacha-fullscreen" style="display: none;">
+            <video id="gachaVideo" class="gacha-video" muted playsinline>
+                <source src="../../assets/images/ガチャ演出.mp4" type="video/mp4">
+                お使いのブラウザは動画タグをサポートしていません。
+            </video>
         </div>
 
         <!-- 当日わかるガチャの場合の表示 -->
@@ -80,7 +87,7 @@
         <!-- 結果表示 -->
         <div id="resultContainer" class="result-container" style="display: none;">
             <div class="card">
-                <h1 style="text-align: center; color: #667eea; margin-bottom: 30px;">
+                <h1 id="congratsMessage" style="text-align: center; color: #667eea; margin-bottom: 30px;">
                     🎉 おめでとうございます！
                 </h1>
                 
@@ -129,20 +136,29 @@
             </div>
 
             <div style="text-align: center; margin-top: 30px;">
-                <button class="btn btn-success" onclick="window.location.href='mypage.html'">
-                    マイページで予約を確認
+                <button id="retryButton" class="btn btn-warning" style="margin-bottom: 10px; display: none;">
+                    もう一度回す<span id="retryCount"></span>
                 </button>
-                <button class="btn btn-secondary" onclick="window.location.href='../../index.html'" style="margin-left: 10px;">
-                    トップページへ
+                <button id="referralButton" class="btn btn-info" style="margin-bottom: 10px; display: none;">
+                    🎁 友達を紹介してもう一度回す
                 </button>
+                <div>
+                    <button class="btn btn-success" onclick="window.location.href='mypage.html'">
+                        この宿で予約確定
+                    </button>
+                </div>
             </div>
         </div>
     </main>
 
+    <!-- Canvas Confetti ライブラリ -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    
     <script src="../../js/data.js"></script>
     <script src="../../js/tourism-data.js"></script>
     <script src="../../js/image-loader.js"></script>
     <script src="../../js/menu.js"></script>
+    <script src="../../js/confetti.js"></script>
     <script>
         const reservationId = sessionStorage.getItem('latestReservationId');
         
@@ -170,13 +186,44 @@
         }
 
         function showGachaAnimation() {
-            document.getElementById('gachaAnimation').style.display = 'block';
+            document.getElementById('gachaAnimation').style.display = 'flex';
+            const video = document.getElementById('gachaVideo');
             
-            // 2秒後に結果を表示
-            setTimeout(() => {
+            // 動画を最初から再生
+            video.currentTime = 0;
+            
+            // 動画再生を試みる
+            const playPromise = video.play();
+            
+            if (playPromise !== undefined) {
+                playPromise
+                    .then(() => {
+                        // 再生成功
+                        console.log('動画再生開始');
+                    })
+                    .catch((error) => {
+                        console.error('動画再生エラー:', error);
+                        // 再生できない場合は3秒後に結果を表示
+                        setTimeout(() => {
+                            document.getElementById('gachaAnimation').style.display = 'none';
+                            showResult();
+                        }, 3000);
+                    });
+            }
+            
+            // 動画終了時に結果を表示
+            video.addEventListener('ended', function() {
                 document.getElementById('gachaAnimation').style.display = 'none';
                 showResult();
-            }, 2000);
+            }, { once: true }); // イベントリスナーを一度だけ実行
+            
+            // タイムアウトを設定（動画が10秒以上の場合の保険）
+            setTimeout(() => {
+                if (document.getElementById('gachaAnimation').style.display !== 'none') {
+                    document.getElementById('gachaAnimation').style.display = 'none';
+                    showResult();
+                }
+            }, 10000);
         }
 
         function showPendingResult() {
@@ -194,10 +241,30 @@
         function showResult() {
             document.getElementById('resultContainer').style.display = 'block';
             
+            // hotel_001の場合は特別な演出
+            if (hotel.id === 'hotel_001') {
+                // お祝いメッセージを特別仕様に
+                const congratsMessage = document.getElementById('congratsMessage');
+                congratsMessage.innerHTML = '<span class="jackpot-text">🎊 おめでとうございます！ 🎊</span>';
+                congratsMessage.classList.add('jackpot-animation');
+                
+                setTimeout(() => {
+                    showConfetti();
+                }, 500); // 結果表示から少し遅らせて演出
+            }
+            
             // ホテル情報を表示
             const hotelImage = document.getElementById('hotelImage');
             loadHotelImage(hotelImage, hotel, '../../');
-            document.getElementById('hotelName').textContent = hotel.name;
+            // ホテル名を表示（hotel_001の場合は特別バッジ付き）
+            const hotelNameElement = document.getElementById('hotelName');
+            hotelNameElement.textContent = hotel.name;
+            if (hotel.id === 'hotel_001') {
+                const badge = document.createElement('span');
+                badge.className = 'special-badge';
+                badge.textContent = '✨ スペシャル';
+                hotelNameElement.appendChild(badge);
+            }
             document.getElementById('hotelAddress').textContent = hotel.address;
             document.getElementById('hotelPhone').textContent = hotel.phone;
             document.getElementById('checkInTime').textContent = hotel.checkIn;
@@ -227,6 +294,7 @@
                     <div><strong>宿泊数:</strong> ${reservation.nights}泊</div>
                     <div><strong>人数:</strong> ${reservation.guests}名</div>
                     <div><strong>料金:</strong> ¥${reservation.price.toLocaleString()}</div>
+                    ${reservation.attempts > 1 ? `<div style="color: #f5576c;"><strong>ガチャ回数:</strong> ${reservation.attempts}回目${reservation.referralBonus ? ' (友達紹介ボーナス)' : ''}</div>` : ''}
                 </div>
             `;
             
@@ -235,7 +303,80 @@
             if (tourismPlanHTML) {
                 document.getElementById('tourismPlanContainer').innerHTML = tourismPlanHTML;
             }
+            
+            // もう一度回すボタンの表示制御（最大2回まで）
+            if (reservation.attempts < 2) {
+                document.getElementById('retryButton').style.display = 'inline-block';
+                document.getElementById('retryCount').textContent = `（残り${2 - reservation.attempts}回）`;
+            } else {
+                // 2回回した後は紹介ボタンを表示
+                document.getElementById('referralButton').style.display = 'inline-block';
+            }
         }
+        
+        // もう一度回すボタンの処理
+        document.getElementById('retryButton').addEventListener('click', function() {
+            let warningMessage;
+            
+            // 2回目（最後）の警告
+            warningMessage = '⚠️ 最終警告：これが最後のガチャです！\n\n' +
+                            '・次の結果で確定となります\n' +
+                            '・もう変更はできません\n' +
+                            '・現在の宿には戻れません\n\n' +
+                            '本当に最後のガチャを回しますか？';
+            
+            if (!confirm(warningMessage)) {
+                return;
+            }
+            
+            // 新しいホテルを選択
+            const hotels = getHotels().filter(h => h.area === reservation.area && h.id !== reservation.hotelId);
+            if (hotels.length === 0) {
+                alert('他の宿泊施設が見つかりません。');
+                return;
+            }
+            
+            const newHotel = hotels[Math.floor(Math.random() * hotels.length)];
+            
+            // 既存の予約を更新
+            const reservations = getReservations();
+            const index = reservations.findIndex(r => r.id === reservation.id);
+            if (index !== -1) {
+                reservations[index].hotelId = newHotel.id;
+                reservations[index].attempts = (reservations[index].attempts || 1) + 1;
+                localStorage.setItem('yadogacha_reservations', JSON.stringify(reservations));
+            }
+            
+            // ページをリロード
+            window.location.reload();
+        });
+        
+        // 友達紹介ボタンの処理
+        document.getElementById('referralButton').addEventListener('click', function() {
+            if (confirm('👥 友達紹介ボーナス！\n\n友達を紹介していただいたお礼として、特別にもう1回ガチャを回せます！\n\n続行しますか？')) {
+                // 新しいホテルを選択
+                const hotels = getHotels().filter(h => h.area === reservation.area && h.id !== reservation.hotelId);
+                if (hotels.length === 0) {
+                    alert('他の宿泊施設が見つかりません。');
+                    return;
+                }
+                
+                const newHotel = hotels[Math.floor(Math.random() * hotels.length)];
+                
+                // 既存の予約を更新（attempts を3に設定して、紹介ボーナスであることを記録）
+                const reservations = getReservations();
+                const index = reservations.findIndex(r => r.id === reservation.id);
+                if (index !== -1) {
+                    reservations[index].hotelId = newHotel.id;
+                    reservations[index].attempts = 3; // 紹介ボーナス
+                    reservations[index].referralBonus = true;
+                    localStorage.setItem('yadogacha_reservations', JSON.stringify(reservations));
+                }
+                
+                // ページをリロード
+                window.location.reload();
+            }
+        });
     </script>
 </body>
 </html>
